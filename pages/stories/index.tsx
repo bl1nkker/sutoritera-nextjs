@@ -1,29 +1,27 @@
-import { GetStaticProps } from "next";
 import Head from "next/head";
-import { fetchStoriesAxios } from "./../../axios/axios";
+import { gql, useQuery, NetworkStatus } from "@apollo/client";
 
-export const getStaticProps: GetStaticProps = async () => {
-  const { getStories } = (await fetchStoriesAxios()).data.data;
-  const { isSuccess, message, result } = getStories;
-  return {
-    props: {
-      isSuccess,
-      message,
-      storiesData: result,
-    },
-  };
-};
+const getStoriesQuery = gql`
+  query getStories {
+    getStories {
+      isSuccess
+      message
+      result {
+        id
+        title
+        content
+        creator
+        interestedUsers
+      }
+    }
+  }
+`;
 
-export default function StoriesContainer({
-  storiesData,
-}: {
-  storiesData: {
-    id: string;
-    title: string;
-    content: string;
-    creator: string;
-  }[];
-}) {
+export default function StoriesContainer() {
+  const { data } = useQuery(getStoriesQuery, {
+    notifyOnNetworkStatusChange: true,
+  });
+  console.log(data.getStories.result);
   return (
     <div>
       <Head>
@@ -32,11 +30,7 @@ export default function StoriesContainer({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        {storiesData.map((story, key) => (
-          <div key={key}>{story.title}</div>
-        ))}
-      </main>
+      <main>Hello</main>
     </div>
   );
 }

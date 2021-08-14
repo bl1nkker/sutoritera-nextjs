@@ -44,7 +44,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <form>
         <button onClick={() => setIsSignIn(!isSignIn)}>Toggle Auth</button>
         <br />
         {!isSignIn && (
@@ -80,6 +80,7 @@ export default function Home() {
         <br />
         <label>Password</label>
         <input
+          autoComplete="current-password"
           value={userCredentials.password}
           name="password"
           type="password"
@@ -88,7 +89,7 @@ export default function Home() {
         />
         <br />
         <button onClick={handleSubmit}>Submit!</button>
-      </main>
+      </form>
     </div>
   );
 }
