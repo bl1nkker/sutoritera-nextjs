@@ -1,4 +1,6 @@
-export const getStoriesQuery = `
+import gql from "graphql-tag";
+
+export const getStories = gql`
 query getStories{
     getStories{
         isSuccess
