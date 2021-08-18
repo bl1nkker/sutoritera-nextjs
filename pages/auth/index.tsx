@@ -1,6 +1,5 @@
 import Head from "next/head";
-import { ChangeEvent, useEffect, useState } from "react";
-import { signUpUserAxios } from "../../axios/axios";
+import { ChangeEvent, useState } from "react";
 
 interface ICredentialsInput {
   email: string;
@@ -30,9 +29,7 @@ export default function Home() {
     if (isSignIn) {
       console.log("Sign in");
     } else {
-      const { signUpUser } = (await signUpUserAxios(userCredentials)).data.data;
-      const { isSuccess, message, result } = signUpUser;
-      console.log(result);
+      console.log("Sign up");
     }
     console.log(userCredentials);
   };
