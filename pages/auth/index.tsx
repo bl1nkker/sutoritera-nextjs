@@ -1,26 +1,28 @@
 import Head from "next/head";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { MouseEvent, useState } from "react";
+import { NextRouter, useRouter } from "next/router";
+import { AuthForm } from "../../components/authPage/authForm";
 import {
   useSignInUserMutation,
   useSignUpUserMutation,
 } from "../../generated/graphqlComponents";
-
-interface ICredentialsInput {
-  email: string;
-  password: string;
-  name?: string;
-  avatar?: string;
-}
+import { IAuthCredentialsInput } from "../../interfaces/interfaces";
+import validator from "validator";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState<boolean>(false);
+  const [queryError, setQueryError] = useState<string | null>(null);
+  const router: NextRouter = useRouter();
+  const [userCredentials, setUserCredentials] = useState<IAuthCredentialsInput>(
+    {
+      email: "",
+      password: "",
+      avatar: "",
+      name: "",
+    }
+  );
 
-  const [userCredentials, setUserCredentials] = useState<ICredentialsInput>({
-    email: "",
-    password: "",
-    avatar: "",
-    name: "",
-  });
+  // GraphQL Mutation
   const [signInUserMutation] = useSignInUserMutation({
     variables: {
       email: userCredentials.email, // value for 'email'
@@ -36,85 +38,70 @@ export default function Home() {
       avatar: userCredentials.avatar, // value for 'avatar'
     },
   });
-  const handleToggle = (
-    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    event.preventDefault();
-    setIsSignIn(!isSignIn);
-  };
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setUserCredentials({
-      ...userCredentials,
-      [event.target.name]: event.target.value,
-    });
-  };
 
   const handleSubmit = async (
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
   ) => {
     event.preventDefault();
     if (isSignIn) {
-      const response = await signInUserMutation();
-      console.log(response);
+      const { data } = await signInUserMutation();
+      if (data?.signInUser?.isSuccess === false) {
+        // error message
+        setQueryError(data?.signInUser?.message as string);
+        console.log("Error", data?.signInUser?.message);
+      } else {
+        // store token and redirect
+        router.push("/");
+      }
     } else {
-      const response = await signUpUserMutation();
-      console.log(response);
+      if (!validator.isEmail(userCredentials.email)) {
+        setQueryError("Email is invalid!");
+      } else if (
+        !validator.isStrongPassword(userCredentials.password, {
+          minLength: 8,
+          pointsForContainingLower: 10,
+          pointsForContainingUpper: 10,
+          pointsForContainingNumber: 10,
+        })
+      ) {
+        console.log(
+          validator.isStrongPassword(userCredentials.password, {
+            minLength: 8,
+            pointsForContainingLower: 100,
+            pointsForContainingUpper: 100,
+            pointsForContainingNumber: 100,
+          }),
+          userCredentials.password
+        );
+        setQueryError(
+          "Please, make password stronger. Your password should contain at least 1 uppercase, 1 lowercase, symbol and number"
+        );
+      } else {
+        const { data } = await signUpUserMutation();
+        if (data?.signUpUser?.isSuccess === false) {
+          // error message
+          setQueryError(data?.signUpUser?.message as string);
+          console.log("Error", data?.signUpUser?.message);
+        } else {
+          // get token and redirect
+          router.push("/");
+        }
+      }
     }
-    console.log(userCredentials);
   };
   return (
     <div>
       <Head>
         <title>Auth</title>
       </Head>
-
-      <form>
-        <button onClick={(event) => handleToggle(event)}>Toggle Auth</button>
-        <br />
-        {!isSignIn && (
-          <>
-            <label>Name</label>
-            <input
-              value={userCredentials.name}
-              name="name"
-              type="text"
-              onChange={(event) => handleChange(event)}
-              placeholder="Input your name here..."
-            />
-            <br />
-            <label>Avatar</label>
-            <input
-              value={userCredentials.avatar}
-              name="avatar"
-              type="text"
-              onChange={(event) => handleChange(event)}
-              placeholder="Upload your avatar here..."
-            />
-            <br />
-          </>
-        )}
-        <label>Email</label>
-        <input
-          value={userCredentials.email}
-          name="email"
-          type="email"
-          onChange={(event) => handleChange(event)}
-          placeholder="Input your email here..."
-        />
-        <br />
-        <label>Password</label>
-        <input
-          autoComplete="current-password"
-          value={userCredentials.password}
-          name="password"
-          type="password"
-          onChange={(event) => handleChange(event)}
-          placeholder="Input your password here..."
-        />
-        <br />
-        <button onClick={(event) => handleSubmit(event)}>Submit!</button>
-      </form>
+      <AuthForm
+        queryError={queryError}
+        handleSubmit={handleSubmit}
+        isSignIn={isSignIn}
+        setIsSignIn={setIsSignIn}
+        userCredentials={userCredentials}
+        setUserCredentials={setUserCredentials}
+      />
     </div>
   );
 }
