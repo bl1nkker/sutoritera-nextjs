@@ -8,6 +8,7 @@ import {
 } from "../../generated/graphqlComponents";
 import { IAuthCredentialsInput } from "../../interfaces/interfaces";
 import validator from "validator";
+import { io } from "socket.io-client";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState<boolean>(false);
@@ -52,6 +53,10 @@ export default function Home() {
       } else {
         // store token and redirect
         router.push("/");
+        io("http://localhost:4000", {
+          transports: ["websocket", "polling", "flashsocket"],
+          query: { userId: data?.signInUser?.result?.id as string },
+        });
       }
     } else {
       if (!validator.isEmail(userCredentials.email)) {
@@ -64,15 +69,6 @@ export default function Home() {
           pointsForContainingNumber: 10,
         })
       ) {
-        console.log(
-          validator.isStrongPassword(userCredentials.password, {
-            minLength: 8,
-            pointsForContainingLower: 100,
-            pointsForContainingUpper: 100,
-            pointsForContainingNumber: 100,
-          }),
-          userCredentials.password
-        );
         setQueryError(
           "Please, make password stronger. Your password should contain at least 1 uppercase, 1 lowercase, symbol and number"
         );
