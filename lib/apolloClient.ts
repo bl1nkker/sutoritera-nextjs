@@ -14,10 +14,21 @@ export type ResolverContext = {
 }
 
 function createIsomorphLink(context: ResolverContext = {}) {
+  // Here i tell NEXTJS to pass cookies to my graphql Server
+  const enchancedFetch = (url:any, init:any) => {
+    return fetch(url, {
+        ...init,
+        headers: {
+            ...init.headers,
+            "Cookie": context.req?.headers.cookie
+        }
+    }).then(response => response)
+}
     const { HttpLink } = require('@apollo/client')
     return new HttpLink({
       uri: 'http://localhost:4000/graphql',
-      credentials: 'same-origin',
+      credentials: 'include',
+      fetch: enchancedFetch
     })
 }
 
