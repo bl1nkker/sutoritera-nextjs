@@ -178,6 +178,11 @@ export type GetStoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesListOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, creator: string, interestedUsers?: Maybe<Array<string>> }>> }> };
 
+export type CreateStoryMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', creator: string, title?: Maybe<string>, content?: Maybe<string> }> }> };
+
 
 export const SignInUserDocument = gql`
     mutation signInUser($email: String!, $password: String!) {
@@ -308,3 +313,43 @@ export function useGetStoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type GetStoriesQueryHookResult = ReturnType<typeof useGetStoriesQuery>;
 export type GetStoriesLazyQueryHookResult = ReturnType<typeof useGetStoriesLazyQuery>;
 export type GetStoriesQueryResult = Apollo.QueryResult<GetStoriesQuery, GetStoriesQueryVariables>;
+export const CreateStoryDocument = gql`
+    mutation createStory {
+  createStory(
+    storyInput: {title: "New nextjs story", content: "New nextjs story"}
+  ) {
+    isSuccess
+    message
+    result {
+      creator
+      title
+      content
+    }
+  }
+}
+    `;
+export type CreateStoryMutationFn = Apollo.MutationFunction<CreateStoryMutation, CreateStoryMutationVariables>;
+
+/**
+ * __useCreateStoryMutation__
+ *
+ * To run a mutation, you first call `useCreateStoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateStoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createStoryMutation, { data, loading, error }] = useCreateStoryMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCreateStoryMutation(baseOptions?: Apollo.MutationHookOptions<CreateStoryMutation, CreateStoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateStoryMutation, CreateStoryMutationVariables>(CreateStoryDocument, options);
+      }
+export type CreateStoryMutationHookResult = ReturnType<typeof useCreateStoryMutation>;
+export type CreateStoryMutationResult = Apollo.MutationResult<CreateStoryMutation>;
+export type CreateStoryMutationOptions = Apollo.BaseMutationOptions<CreateStoryMutation, CreateStoryMutationVariables>;
