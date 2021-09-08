@@ -16,9 +16,9 @@ query getStories{
   }
 `
 
-export const CREATE_STORY_MUTATION = gql`
-  mutation createStory{
-  createStory(storyInput:{title:"New nextjs story", content:"New nextjs story"}){
+export const createStory = gql`
+  mutation createStory($title: String!, $content:String!){
+  createStory(storyInput:{title:$title, content:$content}){
     isSuccess
     message
     result{

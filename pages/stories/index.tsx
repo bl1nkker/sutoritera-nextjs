@@ -1,21 +1,40 @@
 import Head from "next/head";
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { initializeApollo } from "../../lib/apolloClient";
 import { GetServerSideProps } from "next";
 import { GET_STORIES_QUERY } from "../../lib/queries/storiesGraphql";
 import { MouseEvent, useEffect, useState } from "react";
 import { useCreateStoryMutation } from "../../generated/graphqlComponents";
+import Form from "../../components/stories/Form";
+import { IStory } from "../../interfaces/interfaces";
+
+interface IInputData {
+  title: string;
+  content: string;
+}
 
 export default function StoriesContainer() {
+  // Hooks
+  const [storiesList, setStoriesList] = useState<IStory[]>([{}]);
+  const [queryError, setQueryError] = useState<boolean>(false);
+  const [formData, setFormData] = useState<IInputData>({
+    title: "",
+    content: "",
+  });
+
+  // Use CodeGen for mutations and default grapql hook for SSR data
+  // GraphQL
   const {
     data: {
       getStories: { result },
     },
   } = useQuery(GET_STORIES_QUERY);
-
-  const [storiesList, setStoriesList] = useState<any[]>([]);
-  const [queryError, setQueryError] = useState<boolean>(false);
-  const [createStoryMutation] = useCreateStoryMutation({ variables: {} });
+  const [createStoryMutation] = useCreateStoryMutation({
+    variables: {
+      title: formData.title,
+      content: formData.content,
+    },
+  });
 
   useEffect(() => {
     setStoriesList(result);
@@ -29,7 +48,7 @@ export default function StoriesContainer() {
       const isSuccess = response.data?.createStory?.isSuccess;
       if (isSuccess) {
         const createdStory = response.data?.createStory?.result;
-        setStoriesList((prevState) => [...prevState, createdStory]);
+        setStoriesList([...storiesList, createdStory as IStory]);
         console.log("Story created!");
       } else {
         const errorMessage = response.data?.createStory?.message;
@@ -53,9 +72,11 @@ export default function StoriesContainer() {
         </section>
         {/* Form required */}
         <section>
-          <button onClick={(event) => handleCreateStory(event)}>
-            Create new post
-          </button>
+          <Form
+            formData={formData}
+            setFormData={setFormData}
+            handleCreateStory={handleCreateStory}
+          />
         </section>
       </main>
     </div>

@@ -178,7 +178,10 @@ export type GetStoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesListOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, creator: string, interestedUsers?: Maybe<Array<string>> }>> }> };
 
-export type CreateStoryMutationVariables = Exact<{ [key: string]: never; }>;
+export type CreateStoryMutationVariables = Exact<{
+  title: Scalars['String'];
+  content: Scalars['String'];
+}>;
 
 
 export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', creator: string, title?: Maybe<string>, content?: Maybe<string> }> }> };
@@ -314,10 +317,8 @@ export type GetStoriesQueryHookResult = ReturnType<typeof useGetStoriesQuery>;
 export type GetStoriesLazyQueryHookResult = ReturnType<typeof useGetStoriesLazyQuery>;
 export type GetStoriesQueryResult = Apollo.QueryResult<GetStoriesQuery, GetStoriesQueryVariables>;
 export const CreateStoryDocument = gql`
-    mutation createStory {
-  createStory(
-    storyInput: {title: "New nextjs story", content: "New nextjs story"}
-  ) {
+    mutation createStory($title: String!, $content: String!) {
+  createStory(storyInput: {title: $title, content: $content}) {
     isSuccess
     message
     result {
@@ -343,6 +344,8 @@ export type CreateStoryMutationFn = Apollo.MutationFunction<CreateStoryMutation,
  * @example
  * const [createStoryMutation, { data, loading, error }] = useCreateStoryMutation({
  *   variables: {
+ *      title: // value for 'title'
+ *      content: // value for 'content'
  *   },
  * });
  */
