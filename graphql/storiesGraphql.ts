@@ -25,7 +25,23 @@ export const createStory = gql`
       creator
       title
       content
+      createdAt
     }
   }
 }
+`
+export const updateStory = gql`
+  mutation updateStory($title: String!, $content: String!, $storyId: ID!){
+    updateStory(storyInput:{title:$title, content:$content}, storyId:$storyId){
+      isSuccess
+      message
+      result{
+        id
+        creator
+      title
+      content
+      createdAt
+      }
+    }
+  }
 `
