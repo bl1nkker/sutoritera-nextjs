@@ -22,6 +22,7 @@ export const createStory = gql`
     isSuccess
     message
     result{
+      id
       creator
       title
       content
@@ -42,6 +43,18 @@ export const updateStory = gql`
       content
       createdAt
       }
+    }
+  }
+`
+export const deleteStory = gql`
+  mutation deleteStory($storyId: ID!){
+    deleteStory(storyId:$storyId){
+      isSuccess
+      result{
+        id
+        creator
+      }
+      message
     }
   }
 `

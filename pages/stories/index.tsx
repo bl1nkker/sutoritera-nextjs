@@ -6,11 +6,13 @@ import { GET_STORIES_QUERY } from "../../lib/queries/storiesGraphql";
 import { MouseEvent, useEffect, useState } from "react";
 import {
   useCreateStoryMutation,
+  useDeleteStoryMutation,
   useUpdateStoryMutation,
 } from "../../generated/graphqlComponents";
 import Form from "../../components/stories/Form";
 import { IStory } from "../../interfaces/interfaces";
 import { StorySummary } from "../../components/stories/StorySummary";
+import { parseCookie } from "../../lib/parseCookies";
 
 interface IInputData {
   title: string;
@@ -18,8 +20,14 @@ interface IInputData {
   storyId: string;
 }
 
-export default function StoriesContainer() {
+interface Props {
+  uid: string;
+}
+
+export default function StoriesContainer({ uid }: Props) {
   // Hooks
+  const [currentUserId, setCurrentUser] = useState<string>("");
+  const [storyToDelete, setStoryToDelete] = useState<string>("");
   const [storiesList, setStoriesList] = useState<IStory[]>([{}]);
   const [queryError, setQueryError] = useState<boolean>(false);
   const [formData, setFormData] = useState<IInputData>({
@@ -50,7 +58,15 @@ export default function StoriesContainer() {
       storyId: formData.storyId,
     },
   });
+  const [deleteStoryMutation] = useDeleteStoryMutation({
+    variables: {
+      storyId: storyToDelete as string, // value for 'storyId'
+    },
+  });
 
+  useEffect(() => {
+    setCurrentUser(uid);
+  }, [uid]);
   useEffect(() => {
     setStoriesList(result);
   }, [result]);
@@ -96,6 +112,27 @@ export default function StoriesContainer() {
     }
   };
 
+  const handleDeleteStory = (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => {
+    event.preventDefault();
+    deleteStoryMutation({ variables: { storyId } }).then((response) => {
+      const isSuccess = response.data?.deleteStory?.isSuccess;
+      if (isSuccess) {
+        const deletedStory = response.data?.deleteStory?.result;
+        setStoriesList(
+          storiesList.filter((story) => story.id !== deletedStory?.id)
+        );
+        console.log("Story deleted!");
+      } else {
+        const errorMessage = response.data?.deleteStory?.message;
+        setQueryError(true);
+        console.log(errorMessage);
+      }
+    });
+  };
+
   return (
     <div>
       <Head>
@@ -106,10 +143,12 @@ export default function StoriesContainer() {
         <section>
           {storiesList.map((story: any, key: number) => (
             <StorySummary
-              setFormData={setFormData}
               story={story}
               key={key}
+              currentUserId={currentUserId}
+              setFormData={setFormData}
               setFormMode={setFormMode}
+              handleDeleteStory={handleDeleteStory}
             />
           ))}
         </section>
@@ -126,12 +165,14 @@ export default function StoriesContainer() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // Here i need to pass context
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
+  const { uid } = parseCookie(context.req.headers.cookie);
   const apolloClient = initializeApollo(undefined, context);
   await apolloClient.query({
     query: GET_STORIES_QUERY,
   });
 
-  return { props: { initialApolloState: apolloClient.cache.extract() } };
+  return {
+    props: { initialApolloState: apolloClient.cache.extract(), uid: uid },
+  };
 };
