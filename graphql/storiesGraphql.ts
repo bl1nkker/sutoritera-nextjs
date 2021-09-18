@@ -52,9 +52,43 @@ export const deleteStory = gql`
       isSuccess
       result{
         id
-        creator
+      creator
+      title
+      content
+      createdAt
       }
       message
     }
   }
+`
+
+export const interestedInStory = gql`
+mutation interestedInStory($storyId: ID!){
+  interestedInStory(storyId:$storyId){
+    isSuccess
+    result{
+      id
+      creator
+      title
+      content
+      createdAt
+    }
+    message
+  }
+}
+`
+export const unInterestedInStory = gql`
+mutation unInterestedInStory($storyId: ID!){
+  unInterestedInStory(storyId:$storyId){
+    isSuccess
+    result{
+      id
+      creator
+      title
+      content
+      createdAt
+    }
+    message
+  }
+}
 `

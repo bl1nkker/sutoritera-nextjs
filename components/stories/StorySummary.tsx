@@ -10,6 +10,14 @@ interface Props {
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
     storyId: string
   ) => void;
+  handleInterestedInStory: (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => void;
+  handleUnInterestedInStory: (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => void;
 }
 
 interface IInputData {
@@ -24,6 +32,8 @@ export const StorySummary: React.FC<Props> = ({
   setFormMode,
   currentUserId,
   handleDeleteStory,
+  handleInterestedInStory,
+  handleUnInterestedInStory,
 }) => {
   const handleChangeForm = (
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
@@ -44,6 +54,23 @@ export const StorySummary: React.FC<Props> = ({
           onClick={(event) => handleDeleteStory(event, story.id as string)}
         >
           Delete story
+        </button>
+      )}
+      {story.interestedUsers?.indexOf(currentUserId) === -1 ? (
+        <button
+          onClick={(event) =>
+            handleInterestedInStory(event, story.id as string)
+          }
+        >
+          Interesting!
+        </button>
+      ) : (
+        <button
+          onClick={(event) =>
+            handleUnInterestedInStory(event, story.id as string)
+          }
+        >
+          Bruh...
         </button>
       )}
     </div>
