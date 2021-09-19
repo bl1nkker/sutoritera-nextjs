@@ -126,7 +126,7 @@ export default function StoriesContainer({ uid }: Props) {
             story.id === updatedStory?.id ? (updatedStory as IStory) : story
           ),
         ]);
-        console.log("Story updated!");
+        console.log("Story interesting!", storiesList);
       } else {
         const errorMessage = response.data?.interestedInStory?.message;
         setQueryError(true);
@@ -139,18 +139,18 @@ export default function StoriesContainer({ uid }: Props) {
     storyId: string
   ) => {
     event.preventDefault();
-    interestedInStoryMutation({ variables: { storyId } }).then((response) => {
-      const isSuccess = response.data?.interestedInStory?.isSuccess;
+    unInterestedInStoryMutation({ variables: { storyId } }).then((response) => {
+      const isSuccess = response.data?.unInterestedInStory?.isSuccess;
       if (isSuccess) {
-        const updatedStory = response.data?.interestedInStory?.result;
+        const updatedStory = response.data?.unInterestedInStory?.result;
         setStoriesList([
           ...storiesList.map((story) =>
             story.id === updatedStory?.id ? (updatedStory as IStory) : story
           ),
         ]);
-        console.log("Story updated!");
+        console.log("Story not interesting!", storiesList);
       } else {
-        const errorMessage = response.data?.interestedInStory?.message;
+        const errorMessage = response.data?.unInterestedInStory?.message;
         setQueryError(true);
         console.log(errorMessage);
       }

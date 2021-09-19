@@ -29,6 +29,7 @@ export type Mutation = {
   updateStory?: Maybe<StoryOperationMessage>;
   interestedInStory?: Maybe<StoryOperationMessage>;
   unInterestedInStory?: Maybe<StoryOperationMessage>;
+  signInUser?: Maybe<UserOperationMessage>;
   signUpUser?: Maybe<UserOperationMessage>;
   addUserToFriendsList?: Maybe<UserOperationMessage>;
   removeUserFromFriendsList?: Maybe<UserOperationMessage>;
@@ -61,6 +62,12 @@ export type MutationUnInterestedInStoryArgs = {
 };
 
 
+export type MutationSignInUserArgs = {
+  email?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationSignUpUserArgs = {
   userInput: UserInput;
 };
@@ -77,23 +84,16 @@ export type MutationRemoveUserFromFriendsListArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getStories?: Maybe<StoriesOperationMessage>;
-  getCreatedStories?: Maybe<StoriesOperationMessage>;
-  getUsers?: Maybe<UsersOperationMessage>;
-  signInUser?: Maybe<UserOperationMessage>;
+  getStories?: Maybe<StoriesListOperationMessage>;
+  getCreatedStories?: Maybe<StoriesListOperationMessage>;
+  getUsers?: Maybe<UsersListOperationMessage>;
 };
 
-
-export type QuerySignInUserArgs = {
-  email?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
-};
-
-export type StoriesOperationMessage = {
-  __typename?: 'StoriesOperationMessage';
+export type StoriesListOperationMessage = {
+  __typename?: 'StoriesListOperationMessage';
   isSuccess?: Maybe<Scalars['Boolean']>;
   message?: Maybe<Scalars['String']>;
-  result?: Maybe<Array<Maybe<Story>>>;
+  result?: Maybe<Array<Story>>;
 };
 
 export type Story = {
@@ -130,6 +130,7 @@ export type User = {
   createdStories?: Maybe<Array<Scalars['ID']>>;
   interestingStories?: Maybe<Array<Scalars['ID']>>;
   lastOnline?: Maybe<Scalars['String']>;
+  isOnline?: Maybe<Scalars['Boolean']>;
   token?: Maybe<Scalars['String']>;
 };
 
@@ -147,20 +148,20 @@ export type UserOperationMessage = {
   result?: Maybe<User>;
 };
 
-export type UsersOperationMessage = {
-  __typename?: 'UsersOperationMessage';
+export type UsersListOperationMessage = {
+  __typename?: 'UsersListOperationMessage';
   isSuccess?: Maybe<Scalars['Boolean']>;
   message?: Maybe<Scalars['String']>;
-  result?: Maybe<Array<Maybe<User>>>;
+  result?: Maybe<Array<User>>;
 };
 
-export type SignInUserQueryVariables = Exact<{
+export type SignInUserMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
 
-export type SignInUserQuery = { __typename?: 'Query', signInUser?: Maybe<{ __typename?: 'UserOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'User', id?: Maybe<string>, name?: Maybe<string>, email?: Maybe<string>, token?: Maybe<string> }> }> };
+export type SignInUserMutation = { __typename?: 'Mutation', signInUser?: Maybe<{ __typename?: 'UserOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'User', id?: Maybe<string>, name?: Maybe<string>, email?: Maybe<string>, token?: Maybe<string> }> }> };
 
 export type SignUpUserMutationVariables = Exact<{
   email: Scalars['String'];
@@ -175,7 +176,7 @@ export type SignUpUserMutation = { __typename?: 'Mutation', signUpUser?: Maybe<{
 export type GetStoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, creator: string, interestedUsers?: Maybe<Array<string>> }>>> }> };
+export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesListOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }>> }> };
 
 export type CreateStoryMutationVariables = Exact<{
   title: Scalars['String'];
@@ -183,7 +184,7 @@ export type CreateStoryMutationVariables = Exact<{
 }>;
 
 
-export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type UpdateStoryMutationVariables = Exact<{
   title: Scalars['String'];
@@ -192,32 +193,32 @@ export type UpdateStoryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateStoryMutation = { __typename?: 'Mutation', updateStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type UpdateStoryMutation = { __typename?: 'Mutation', updateStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type DeleteStoryMutationVariables = Exact<{
   storyId: Scalars['ID'];
 }>;
 
 
-export type DeleteStoryMutation = { __typename?: 'Mutation', deleteStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type DeleteStoryMutation = { __typename?: 'Mutation', deleteStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type InterestedInStoryMutationVariables = Exact<{
   storyId: Scalars['ID'];
 }>;
 
 
-export type InterestedInStoryMutation = { __typename?: 'Mutation', interestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type InterestedInStoryMutation = { __typename?: 'Mutation', interestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type UnInterestedInStoryMutationVariables = Exact<{
   storyId: Scalars['ID'];
 }>;
 
 
-export type UnInterestedInStoryMutation = { __typename?: 'Mutation', unInterestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type UnInterestedInStoryMutation = { __typename?: 'Mutation', unInterestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 
 export const SignInUserDocument = gql`
-    query signInUser($email: String!, $password: String!) {
+    mutation signInUser($email: String!, $password: String!) {
   signInUser(email: $email, password: $password) {
     isSuccess
     message
@@ -230,35 +231,33 @@ export const SignInUserDocument = gql`
   }
 }
     `;
+export type SignInUserMutationFn = Apollo.MutationFunction<SignInUserMutation, SignInUserMutationVariables>;
 
 /**
- * __useSignInUserQuery__
+ * __useSignInUserMutation__
  *
- * To run a query within a React component, call `useSignInUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useSignInUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useSignInUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignInUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useSignInUserQuery({
+ * const [signInUserMutation, { data, loading, error }] = useSignInUserMutation({
  *   variables: {
  *      email: // value for 'email'
  *      password: // value for 'password'
  *   },
  * });
  */
-export function useSignInUserQuery(baseOptions: Apollo.QueryHookOptions<SignInUserQuery, SignInUserQueryVariables>) {
+export function useSignInUserMutation(baseOptions?: Apollo.MutationHookOptions<SignInUserMutation, SignInUserMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SignInUserQuery, SignInUserQueryVariables>(SignInUserDocument, options);
+        return Apollo.useMutation<SignInUserMutation, SignInUserMutationVariables>(SignInUserDocument, options);
       }
-export function useSignInUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SignInUserQuery, SignInUserQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SignInUserQuery, SignInUserQueryVariables>(SignInUserDocument, options);
-        }
-export type SignInUserQueryHookResult = ReturnType<typeof useSignInUserQuery>;
-export type SignInUserLazyQueryHookResult = ReturnType<typeof useSignInUserLazyQuery>;
-export type SignInUserQueryResult = Apollo.QueryResult<SignInUserQuery, SignInUserQueryVariables>;
+export type SignInUserMutationHookResult = ReturnType<typeof useSignInUserMutation>;
+export type SignInUserMutationResult = Apollo.MutationResult<SignInUserMutation>;
+export type SignInUserMutationOptions = Apollo.BaseMutationOptions<SignInUserMutation, SignInUserMutationVariables>;
 export const SignUpUserDocument = gql`
     mutation signUpUser($email: String!, $password: String!, $name: String, $avatar: String) {
   signUpUser(
@@ -314,8 +313,9 @@ export const GetStoriesDocument = gql`
       id
       title
       content
-      creator
       interestedUsers
+      creator
+      createdAt
     }
   }
 }
@@ -354,9 +354,10 @@ export const CreateStoryDocument = gql`
     message
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
   }
@@ -396,9 +397,10 @@ export const UpdateStoryDocument = gql`
     message
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
   }
@@ -438,9 +440,10 @@ export const DeleteStoryDocument = gql`
     isSuccess
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
     message
@@ -479,9 +482,10 @@ export const InterestedInStoryDocument = gql`
     isSuccess
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
     message
@@ -520,9 +524,10 @@ export const UnInterestedInStoryDocument = gql`
     isSuccess
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
     message

@@ -6,11 +6,12 @@ query getStories{
         isSuccess
         message
         result {
-          id
-          title
-          content
-          creator
-          interestedUsers
+          id,
+          title,
+          content,
+          interestedUsers,
+          creator,
+          createdAt
         }
     }
   }
@@ -22,10 +23,11 @@ export const createStory = gql`
     isSuccess
     message
     result{
-      id
-      creator
-      title
-      content
+      id,
+      title,
+      content,
+      interestedUsers,
+      creator,
       createdAt
     }
   }
@@ -37,11 +39,12 @@ export const updateStory = gql`
       isSuccess
       message
       result{
-        id
-        creator
-      title
-      content
-      createdAt
+        id,
+        title,
+        content,
+        interestedUsers,
+        creator,
+        createdAt
       }
     }
   }
@@ -51,11 +54,12 @@ export const deleteStory = gql`
     deleteStory(storyId:$storyId){
       isSuccess
       result{
-        id
-      creator
-      title
-      content
-      createdAt
+        id,
+        title,
+        content,
+        interestedUsers,
+        creator,
+        createdAt
       }
       message
     }
@@ -67,11 +71,12 @@ mutation interestedInStory($storyId: ID!){
   interestedInStory(storyId:$storyId){
     isSuccess
     result{
-      id
-      creator
-      title
-      content
-      createdAt
+      id,
+        title,
+        content,
+        interestedUsers,
+        creator,
+        createdAt
     }
     message
   }
@@ -82,11 +87,12 @@ mutation unInterestedInStory($storyId: ID!){
   unInterestedInStory(storyId:$storyId){
     isSuccess
     result{
-      id
-      creator
-      title
-      content
-      createdAt
+      id,
+        title,
+        content,
+        interestedUsers,
+        creator,
+        createdAt
     }
     message
   }

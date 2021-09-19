@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 
 export const signInUser = gql`
-query signInUser($email:String!, $password:String!){
+mutation signInUser($email:String!, $password:String!){
   signInUser(email:$email, password:$password){
     isSuccess
     message
