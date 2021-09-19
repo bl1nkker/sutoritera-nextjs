@@ -176,7 +176,7 @@ export type SignUpUserMutation = { __typename?: 'Mutation', signUpUser?: Maybe<{
 export type GetStoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesListOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, creator: string, interestedUsers?: Maybe<Array<string>> }>> }> };
+export type GetStoriesQuery = { __typename?: 'Query', getStories?: Maybe<{ __typename?: 'StoriesListOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<Array<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }>> }> };
 
 export type CreateStoryMutationVariables = Exact<{
   title: Scalars['String'];
@@ -184,7 +184,7 @@ export type CreateStoryMutationVariables = Exact<{
 }>;
 
 
-export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type CreateStoryMutation = { __typename?: 'Mutation', createStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type UpdateStoryMutationVariables = Exact<{
   title: Scalars['String'];
@@ -193,14 +193,28 @@ export type UpdateStoryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateStoryMutation = { __typename?: 'Mutation', updateStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string, title?: Maybe<string>, content?: Maybe<string>, createdAt?: Maybe<string> }> }> };
+export type UpdateStoryMutation = { __typename?: 'Mutation', updateStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 export type DeleteStoryMutationVariables = Exact<{
   storyId: Scalars['ID'];
 }>;
 
 
-export type DeleteStoryMutation = { __typename?: 'Mutation', deleteStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, creator: string }> }> };
+export type DeleteStoryMutation = { __typename?: 'Mutation', deleteStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
+
+export type InterestedInStoryMutationVariables = Exact<{
+  storyId: Scalars['ID'];
+}>;
+
+
+export type InterestedInStoryMutation = { __typename?: 'Mutation', interestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
+
+export type UnInterestedInStoryMutationVariables = Exact<{
+  storyId: Scalars['ID'];
+}>;
+
+
+export type UnInterestedInStoryMutation = { __typename?: 'Mutation', unInterestedInStory?: Maybe<{ __typename?: 'StoryOperationMessage', isSuccess?: Maybe<boolean>, message?: Maybe<string>, result?: Maybe<{ __typename?: 'Story', id?: Maybe<string>, title?: Maybe<string>, content?: Maybe<string>, interestedUsers?: Maybe<Array<string>>, creator: string, createdAt?: Maybe<string> }> }> };
 
 
 export const SignInUserDocument = gql`
@@ -299,8 +313,9 @@ export const GetStoriesDocument = gql`
       id
       title
       content
-      creator
       interestedUsers
+      creator
+      createdAt
     }
   }
 }
@@ -339,9 +354,10 @@ export const CreateStoryDocument = gql`
     message
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
   }
@@ -381,9 +397,10 @@ export const UpdateStoryDocument = gql`
     message
     result {
       id
-      creator
       title
       content
+      interestedUsers
+      creator
       createdAt
     }
   }
@@ -423,7 +440,11 @@ export const DeleteStoryDocument = gql`
     isSuccess
     result {
       id
+      title
+      content
+      interestedUsers
       creator
+      createdAt
     }
     message
   }
@@ -455,3 +476,87 @@ export function useDeleteStoryMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DeleteStoryMutationHookResult = ReturnType<typeof useDeleteStoryMutation>;
 export type DeleteStoryMutationResult = Apollo.MutationResult<DeleteStoryMutation>;
 export type DeleteStoryMutationOptions = Apollo.BaseMutationOptions<DeleteStoryMutation, DeleteStoryMutationVariables>;
+export const InterestedInStoryDocument = gql`
+    mutation interestedInStory($storyId: ID!) {
+  interestedInStory(storyId: $storyId) {
+    isSuccess
+    result {
+      id
+      title
+      content
+      interestedUsers
+      creator
+      createdAt
+    }
+    message
+  }
+}
+    `;
+export type InterestedInStoryMutationFn = Apollo.MutationFunction<InterestedInStoryMutation, InterestedInStoryMutationVariables>;
+
+/**
+ * __useInterestedInStoryMutation__
+ *
+ * To run a mutation, you first call `useInterestedInStoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInterestedInStoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [interestedInStoryMutation, { data, loading, error }] = useInterestedInStoryMutation({
+ *   variables: {
+ *      storyId: // value for 'storyId'
+ *   },
+ * });
+ */
+export function useInterestedInStoryMutation(baseOptions?: Apollo.MutationHookOptions<InterestedInStoryMutation, InterestedInStoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<InterestedInStoryMutation, InterestedInStoryMutationVariables>(InterestedInStoryDocument, options);
+      }
+export type InterestedInStoryMutationHookResult = ReturnType<typeof useInterestedInStoryMutation>;
+export type InterestedInStoryMutationResult = Apollo.MutationResult<InterestedInStoryMutation>;
+export type InterestedInStoryMutationOptions = Apollo.BaseMutationOptions<InterestedInStoryMutation, InterestedInStoryMutationVariables>;
+export const UnInterestedInStoryDocument = gql`
+    mutation unInterestedInStory($storyId: ID!) {
+  unInterestedInStory(storyId: $storyId) {
+    isSuccess
+    result {
+      id
+      title
+      content
+      interestedUsers
+      creator
+      createdAt
+    }
+    message
+  }
+}
+    `;
+export type UnInterestedInStoryMutationFn = Apollo.MutationFunction<UnInterestedInStoryMutation, UnInterestedInStoryMutationVariables>;
+
+/**
+ * __useUnInterestedInStoryMutation__
+ *
+ * To run a mutation, you first call `useUnInterestedInStoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnInterestedInStoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unInterestedInStoryMutation, { data, loading, error }] = useUnInterestedInStoryMutation({
+ *   variables: {
+ *      storyId: // value for 'storyId'
+ *   },
+ * });
+ */
+export function useUnInterestedInStoryMutation(baseOptions?: Apollo.MutationHookOptions<UnInterestedInStoryMutation, UnInterestedInStoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnInterestedInStoryMutation, UnInterestedInStoryMutationVariables>(UnInterestedInStoryDocument, options);
+      }
+export type UnInterestedInStoryMutationHookResult = ReturnType<typeof useUnInterestedInStoryMutation>;
+export type UnInterestedInStoryMutationResult = Apollo.MutationResult<UnInterestedInStoryMutation>;
+export type UnInterestedInStoryMutationOptions = Apollo.BaseMutationOptions<UnInterestedInStoryMutation, UnInterestedInStoryMutationVariables>;

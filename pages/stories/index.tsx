@@ -7,6 +7,8 @@ import { MouseEvent, useEffect, useState } from "react";
 import {
   useCreateStoryMutation,
   useDeleteStoryMutation,
+  useInterestedInStoryMutation,
+  useUnInterestedInStoryMutation,
   useUpdateStoryMutation,
 } from "../../generated/graphqlComponents";
 import Form from "../../components/stories/Form";
@@ -27,7 +29,6 @@ interface Props {
 export default function StoriesContainer({ uid }: Props) {
   // Hooks
   const [currentUserId, setCurrentUser] = useState<string>("");
-  const [storyToDelete, setStoryToDelete] = useState<string>("");
   const [storiesList, setStoriesList] = useState<IStory[]>([{}]);
   const [queryError, setQueryError] = useState<boolean>(false);
   const [formData, setFormData] = useState<IInputData>({
@@ -58,11 +59,9 @@ export default function StoriesContainer({ uid }: Props) {
       storyId: formData.storyId,
     },
   });
-  const [deleteStoryMutation] = useDeleteStoryMutation({
-    variables: {
-      storyId: storyToDelete as string, // value for 'storyId'
-    },
-  });
+  const [deleteStoryMutation] = useDeleteStoryMutation();
+  const [unInterestedInStoryMutation] = useUnInterestedInStoryMutation();
+  const [interestedInStoryMutation] = useInterestedInStoryMutation();
 
   useEffect(() => {
     setCurrentUser(uid);
@@ -112,6 +111,52 @@ export default function StoriesContainer({ uid }: Props) {
     }
   };
 
+  const handleInterestedInStory = (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => {
+    event.preventDefault();
+    interestedInStoryMutation({ variables: { storyId } }).then((response) => {
+      const isSuccess = response.data?.interestedInStory?.isSuccess;
+      if (isSuccess) {
+        const updatedStory = response.data?.interestedInStory?.result;
+
+        setStoriesList([
+          ...storiesList.map((story) =>
+            story.id === updatedStory?.id ? (updatedStory as IStory) : story
+          ),
+        ]);
+        console.log("Story interesting!", storiesList);
+      } else {
+        const errorMessage = response.data?.interestedInStory?.message;
+        setQueryError(true);
+        console.log(errorMessage);
+      }
+    });
+  };
+  const handleUnInterestedInStory = (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => {
+    event.preventDefault();
+    unInterestedInStoryMutation({ variables: { storyId } }).then((response) => {
+      const isSuccess = response.data?.unInterestedInStory?.isSuccess;
+      if (isSuccess) {
+        const updatedStory = response.data?.unInterestedInStory?.result;
+        setStoriesList([
+          ...storiesList.map((story) =>
+            story.id === updatedStory?.id ? (updatedStory as IStory) : story
+          ),
+        ]);
+        console.log("Story not interesting!", storiesList);
+      } else {
+        const errorMessage = response.data?.unInterestedInStory?.message;
+        setQueryError(true);
+        console.log(errorMessage);
+      }
+    });
+  };
+
   const handleDeleteStory = (
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
     storyId: string
@@ -149,6 +194,8 @@ export default function StoriesContainer({ uid }: Props) {
               setFormData={setFormData}
               setFormMode={setFormMode}
               handleDeleteStory={handleDeleteStory}
+              handleInterestedInStory={handleInterestedInStory}
+              handleUnInterestedInStory={handleUnInterestedInStory}
             />
           ))}
         </section>

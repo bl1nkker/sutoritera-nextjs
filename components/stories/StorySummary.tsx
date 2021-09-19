@@ -1,4 +1,10 @@
-import React, { Dispatch, MouseEvent, SetStateAction } from "react";
+import React, {
+  Dispatch,
+  MouseEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { IStory } from "../../interfaces/interfaces";
 
 interface Props {
@@ -7,6 +13,14 @@ interface Props {
   setFormMode: Dispatch<SetStateAction<string>>;
   currentUserId: string;
   handleDeleteStory: (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => void;
+  handleInterestedInStory: (
+    event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    storyId: string
+  ) => void;
+  handleUnInterestedInStory: (
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
     storyId: string
   ) => void;
@@ -24,26 +38,58 @@ export const StorySummary: React.FC<Props> = ({
   setFormMode,
   currentUserId,
   handleDeleteStory,
+  handleInterestedInStory,
+  handleUnInterestedInStory,
 }) => {
+  const [currentStory, setCurrentStory] = useState<IStory>();
+  const [currentUid, setCurrentUid] = useState<string>("");
+  useEffect(() => {
+    setCurrentStory(story);
+  }, [story]);
+  useEffect(() => {
+    setCurrentUid(currentUserId);
+  }, [currentUserId]);
   const handleChangeForm = (
     event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
   ) => {
     event.preventDefault();
-    setFormData({ ...(story as IInputData), storyId: story.id as string });
+    setFormData({
+      ...(currentStory as IInputData),
+      storyId: currentStory?.id as string,
+    });
     setFormMode("edit");
   };
   return (
     <div>
-      <h3>{story.title}</h3>
-      <p>{story.content}</p>
-      {currentUserId === story.creator && (
+      <h3>{currentStory?.title}</h3>
+      <p>{currentStory?.content}</p>
+      {currentUid === currentStory?.creator && (
         <button onClick={(event) => handleChangeForm(event)}>Edit story</button>
       )}
-      {currentUserId === story.creator && (
+      {currentUid === currentStory?.creator && (
         <button
-          onClick={(event) => handleDeleteStory(event, story.id as string)}
+          onClick={(event) =>
+            handleDeleteStory(event, currentStory?.id as string)
+          }
         >
           Delete story
+        </button>
+      )}
+      {currentStory?.interestedUsers?.indexOf(currentUid) === -1 ? (
+        <button
+          onClick={(event) =>
+            handleInterestedInStory(event, currentStory?.id as string)
+          }
+        >
+          Interesting!
+        </button>
+      ) : (
+        <button
+          onClick={(event) =>
+            handleUnInterestedInStory(event, currentStory?.id as string)
+          }
+        >
+          Bruh...
         </button>
       )}
     </div>
